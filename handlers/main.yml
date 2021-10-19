@@ -3,11 +3,13 @@
 - name: Restart openvpn-iptables
   listen: "Restart openvpn-iptables"
   ansible.builtin.systemd:
+    daemon_reload: yes
     name: openvpn-iptables.service
     state: restarted
 
 - name: Restart openvpn-server
   listen: "Restart openvpn-server"
   ansible.builtin.systemd:
+    daemon_reload: yes
     name: openvpn-server@server.service
     state: restarted
