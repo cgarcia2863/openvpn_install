@@ -1,0 +1,17 @@
+[Unit]
+Before=network.target
+[Service]
+Type=oneshot
+ExecStart={{ iptables_cmd }} -t nat -A POSTROUTING -s 10.8.0.0/24 ! -d 10.8.0.0/24 -j SNAT --to {% if openvpn_ipv4_addr == '' %}{{ ansible_default_ipv4.address }}{% else %}{{ openvpn_ipv4_addr }}{% endif %}
+
+ExecStart={{ iptables_cmd }} -I INPUT -p {{ openvpn_protocol }} --dport {{ openvpn_port }} -j ACCEPT
+ExecStart={{ iptables_cmd }} -I FORWARD -s 10.8.0.0/24 -j ACCEPT
+ExecStart={{ iptables_cmd }} -I FORWARD -m state --state RELATED,ESTABLISHED -j ACCEPT
+ExecStop={{ iptables_cmd }} -t nat -D POSTROUTING -s 10.8.0.0/24 ! -d 10.8.0.0/24 -j SNAT --to {% if openvpn_ipv4_addr == '' %}{{ ansible_default_ipv4.address }}{% else %}{{ openvpn_ipv4_addr }}{% endif %}
+
+ExecStop={{ iptables_cmd }} -D INPUT -p {{ openvpn_protocol }} --dport {{ openvpn_port }} -j ACCEPT
+ExecStop={{ iptables_cmd }} -D FORWARD -s 10.8.0.0/24 -j ACCEPT
+ExecStop={{ iptables_cmd }} -D FORWARD -m state --state RELATED,ESTABLISHED -j ACCEPT
+RemainAfterExit=yes
+[Install]
+WantedBy=multi-user.target

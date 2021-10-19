@@ -1,0 +1,29 @@
+---
+# defaults file for openvpn_install
+openvpn_group: nogroup
+openvpn_ipv4_addr: ''
+openvpn_public_ip_addr: ''
+openvpn_protocol: udp
+openvpn_port: 1194
+openvpn_dns_servers:
+  - 208.67.222.222
+  - 208.67.220.220
+openvpn_dh_params: |
+  -----BEGIN DH PARAMETERS-----
+  MIIBCAKCAQEA//////////+t+FRYortKmq/cViAnPTzx2LnFg84tNpWp4TZBFGQz
+  +8yTnc4kmz75fS/jY2MMddj2gbICrsRhetPfHtXV/WVhJDP1H18GbtCFY2VVPe0a
+  87VXE15/V8k1mE8McODmi3fipona8+/och3xWKE2rec1MKzKT0g6eXq8CrGCsyT7
+  YdEIqUuyyOP7uWrat2DX9GgdT0Kj3jlN9K5W7edjcrsZCwenyO4KbXCeAvzhzffi
+  7MA0BM0oNC9hkXL+nOmFg/+OTxIy7vKBg8P+OxtMb61zO7X8vC7CIAXFjvGDfRaD
+  ssbzSibBsu/6iGtCOGEoXJf//////////wIBAg==
+  -----END DH PARAMETERS-----
+openvpn_client_name: 'client_zero'
+# openvpn_client_download_dir: /tmp
+
+iptables_cmd: /usr/sbin/iptables
+
+easy_rsa_url: https://github.com/OpenVPN/easy-rsa/releases/download/v3.0.8/EasyRSA-3.0.8.tgz
+easy_rsa_path: /etc/openvpn/server/easy-rsa
+easy_rsa_crl_days: "3650"
+easy_rsa_server_cert_expire: "3650"
+easy_rsa_client_cert_expire: "3650"

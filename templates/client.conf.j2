@@ -1,0 +1,26 @@
+client
+dev tun
+proto {{ openvpn_protocol }}
+remote {% if openvpn_public_ip_addr == '' %}{{ public_ip.content }} {% else %}{{ openvpn_public_ip_addr }} {% endif %}{{ openvpn_port }}
+resolv-retry infinite
+nobind
+persist-key
+persist-tun
+remote-cert-tls server
+auth SHA512
+cipher AES-256-CBC
+ignore-unknown-option block-outside-dns
+block-outside-dns
+verb 3
+<ca>
+{{ openvpn_ca_file.content | b64decode -}}
+</ca>
+<cert>
+{{ client_cert.stdout }}
+</cert>
+<key>
+{{ client_key.content | b64decode -}}
+</key>
+<tls-crypt>
+{{ openvpn_tc_key.stdout }}
+</tls-crypt>

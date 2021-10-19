@@ -1,0 +1,13 @@
+---
+# handlers file for openvpn_install
+- name: Restart openvpn-iptables
+  listen: "Restart openvpn-iptables"
+  ansible.builtin.systemd:
+    name: openvpn-iptables.service
+    state: restarted
+
+- name: Restart openvpn-server
+  listen: "Restart openvpn-server"
+  ansible.builtin.systemd:
+    name: openvpn-server@server.service
+    state: restarted

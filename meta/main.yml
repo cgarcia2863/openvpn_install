@@ -1,0 +1,12 @@
+galaxy_info:
+  author: Carlos Garcia
+  description: Installs OpenVPN based on openvpn-install.sh
+  company: D4rkness
+  license: GPL-2.0-or-later
+  min_ansible_version: 2.9
+  platforms:
+  - name: Ubuntu
+    versions:
+    - all
+  galaxy_tags: []
+dependencies: []

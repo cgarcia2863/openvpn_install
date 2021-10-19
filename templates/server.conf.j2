@@ -1,0 +1,32 @@
+{% if openvpn_ipv4_addr == '' %}
+local {{ ansible_default_ipv4.address }}
+{% else %}
+local {{ openvpn_ipv4_addr }}
+{% endif %}
+port {{ openvpn_port }}
+proto {{ openvpn_protocol }}
+dev tun
+ca ca.crt
+cert server.crt
+key server.key
+dh dh.pem
+auth SHA512
+tls-crypt tc.key
+topology subnet
+server 10.8.0.0 255.255.255.0
+push "redirect-gateway def1 bypass-dhcp"
+ifconfig-pool-persist ipp.txt
+{% for dns in openvpn_dns_servers %}
+push "dhcp-option DNS {{ dns }}"
+{% endfor%}
+keepalive 10 120
+cipher AES-256-CBC
+user nobody
+group {{ openvpn_group }}
+persist-key
+persist-tun
+verb 3
+crl-verify crl.pem
+{% if openvpn_protocol == 'udp' %}
+explicit-exit-notify
+{% endif %}
