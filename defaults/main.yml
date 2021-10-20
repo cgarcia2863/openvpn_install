@@ -27,3 +27,9 @@ easy_rsa_path: /etc/openvpn/server/easy-rsa
 easy_rsa_crl_days: "3650"
 easy_rsa_server_cert_expire: "3650"
 easy_rsa_client_cert_expire: "3650"
+
+mail_host: smtp.gmail.com
+mail_port: 587
+# mail_username:
+# mail_password:
+# mail_recipient:
