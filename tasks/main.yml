@@ -362,5 +362,5 @@
     to: "{{ mail_recipient }}"
     subject: OpenVPN Client Configuration [Eyes Only]
     body: "OpenVPN client configuration file attached in this email."
-    attach: "{{ openvpn_client_download_dir }}/{{ openvpn_client_name }}.ovpn"
+    attach: "/root/{{ openvpn_client_name }}.ovpn"
   delegate_to: localhost
