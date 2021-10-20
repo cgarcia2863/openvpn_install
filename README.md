@@ -1,4 +1,4 @@
-openvpn_install
+Ansible Role: openvpn_install
 =========
 
 Simple OpenVPN installation following some of the steps found in the openvpn-install.sh script.
