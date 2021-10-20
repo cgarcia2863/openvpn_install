@@ -16,6 +16,7 @@
   tags:
     - setup
     - easyrsa
+    - packages
   ansible.builtin.file:
     path: "{{ easy_rsa_path }}"
     state: directory
@@ -27,6 +28,7 @@
   tags:
     - setup
     - easyrsa
+    - packages
   ansible.builtin.unarchive:
     src: "{{ easy_rsa_url }}"
     dest: "{{ easy_rsa_path }}"
@@ -39,6 +41,7 @@
   tags:
     - setup
     - easyrsa
+    - create_openvpn_server_certs
   ansible.builtin.stat:
     path: "{{ easy_rsa_path }}/pki"
   register: pki_dir
@@ -47,6 +50,7 @@
   tags:
     - setup
     - easyrsa
+    - create_openvpn_server_certs
   when: not pki_dir.stat.exists
   ansible.builtin.command: "{{ easy_rsa_path }}/easyrsa init-pki"
   args:
@@ -56,6 +60,7 @@
   tags:
     - setup
     - easyrsa
+    - create_openvpn_server_certs
   ansible.builtin.stat:
     path: "{{ easy_rsa_path }}/pki/ca.crt"
   register: pki_ca
@@ -64,6 +69,7 @@
   tags:
     - setup
     - easyrsa
+    - create_openvpn_server_certs
   when: not pki_ca.stat.exists
   ansible.builtin.command: "{{ easy_rsa_path }}/easyrsa --batch build-ca nopass"
   args:
@@ -73,6 +79,7 @@
   tags:
     - setup
     - easyrsa
+    - create_openvpn_server_certs
   ansible.builtin.stat:
     path: "{{ easy_rsa_path }}/pki/issued/server.crt"
   register: pki_server
@@ -81,6 +88,7 @@
   tags:
     - setup
     - easyrsa
+    - create_openvpn_server_certs
   when: not pki_server.stat.exists
   environment:
     EASYRSA_CERT_EXPIRE: "{{ easy_rsa_server_cert_expire }}"
@@ -92,6 +100,7 @@
   tags:
     - setup
     - easyrsa
+    - create_openvpn_server_certs
   ansible.builtin.stat:
     path: "{{ easy_rsa_path }}/pki/crl.pem"
   register: pki_crl
@@ -100,6 +109,7 @@
   tags:
     - setup
     - easyrsa
+    - create_openvpn_server_certs
   when: not pki_crl.stat.exists
   environment:
     EASYRSA_CERT_EXPIRE: "{{ easy_rsa_crl_days }}"
@@ -111,6 +121,7 @@
   tags:
     - setup
     - easyrsa
+    - create_openvpn_server_certs
   ansible.builtin.copy:
     src: "{{ easy_rsa_path }}/pki/ca.crt"
     dest: /etc/openvpn/server/ca.crt
@@ -120,6 +131,7 @@
   tags:
     - setup
     - easyrsa
+    - create_openvpn_server_certs
   ansible.builtin.copy:
     src: "{{ easy_rsa_path }}/pki/private/ca.key"
     dest: /etc/openvpn/server/ca.key
@@ -129,6 +141,7 @@
   tags:
     - setup
     - easyrsa
+    - create_openvpn_server_certs
   ansible.builtin.copy:
     src: "{{ easy_rsa_path }}/pki/issued/server.crt"
     dest: /etc/openvpn/server/server.crt
@@ -138,6 +151,7 @@
   tags:
     - setup
     - easyrsa
+    - create_openvpn_server_certs
   ansible.builtin.copy:
     src: "{{ easy_rsa_path }}/pki/private/server.key"
     dest: /etc/openvpn/server/server.key
@@ -147,6 +161,7 @@
   tags:
     - setup
     - easyrsa
+    - create_openvpn_server_certs
   ansible.builtin.copy:
     src: "{{ easy_rsa_path }}/pki/crl.pem"
     dest: /etc/openvpn/server/crl.pem
@@ -155,7 +170,7 @@
 - name: Change file ownership of crl
   tags:
     - setup
-    - easyrsa
+    - openvpn
   ansible.builtin.file:
     path: /etc/openvpn/server/crl.pem
     owner: nobody
@@ -164,7 +179,7 @@
 - name: Change directory ownership /etc/openvpn/server/
   tags:
     - setup
-    - easyrsa
+    - openvpn
   ansible.builtin.file:
     path: /etc/openvpn/server/
     owner: nobody
@@ -173,7 +188,7 @@
 - name: check for tls-crypt key
   tags:
     - setup
-    - easyrsa
+    - openvpn
   ansible.builtin.stat:
     path: /etc/openvpn/server/tc.key
   register: tls_crypt_key
@@ -181,14 +196,14 @@
 - name: Generate key for tls-crypt
   tags:
     - setup
-    - easyrsa
+    - openvpn
   when: not tls_crypt_key.stat.exists
   ansible.builtin.command: openvpn --genkey --secret /etc/openvpn/server/tc.key
 
 - name: Create the DH parameters file using the predefined ffdhe2048 group
   tags:
     - setup
-    - easyrsa
+    - openvpn
   ansible.builtin.copy:
     content: "{{ openvpn_dh_params }}"
     dest: /etc/openvpn/server/dh.pem
@@ -197,6 +212,7 @@
   tags:
     - setup
     - openvpn
+    - gen_openvpn_config
   notify: "Restart openvpn-server"
   ansible.builtin.template:
     src: server.conf.j2
@@ -206,6 +222,7 @@
   tags:
     - setup
     - openvpn
+    - gen_openvpn_config
   ansible.builtin.systemd:
     daemon_reload: yes
     name: openvpn-server@server.service
@@ -228,6 +245,7 @@
   tags:
     - setup
     - openvpn
+    - gen_openvpn_config
   notify: "Restart openvpn-iptables"
   ansible.builtin.template:
     src: openvpn-iptables.service.j2
@@ -237,6 +255,7 @@
   tags:
     - setup
     - openvpn
+    - gen_openvpn_config
   ansible.builtin.systemd:
     daemon_reload: yes
     name: openvpn-iptables.service
@@ -246,6 +265,7 @@
 - name: Obtain Public IP
   tags:
     - client_setup
+    - obtain_public_ip
   when: openvpn_public_ip_addr == ''
   ansible.builtin.uri:
     url: https://ipinfo.io/ip
@@ -255,6 +275,7 @@
 - name: "check for previous easy-rsa {{ openvpn_client_name }} data"
   tags:
     - client_setup
+    - create_openvpn_client
   ansible.builtin.stat:
     path: "{{ easy_rsa_path }}/pki/issued/{{ openvpn_client_name }}.crt"
   register: pki_client
@@ -262,6 +283,7 @@
 - name: "easy-rsa run build-client-full {{ openvpn_client_name }}"
   tags:
     - client_setup
+    - create_openvpn_client
   when: not pki_client.stat.exists
   environment:
     EASYRSA_CERT_EXPIRE: "{{ easy_rsa_client_cert_expire }}"
@@ -272,6 +294,7 @@
 - name: read ca.crt
   tags:
     - client_setup
+    - create_openvpn_client
   no_log: true
   ansible.builtin.slurp:
     src: /etc/openvpn/server/easy-rsa/pki/ca.crt
@@ -280,6 +303,7 @@
 - name: "read {{ openvpn_client_name }} certificate"
   tags:
     - client_setup
+    - create_openvpn_client
   no_log: true
   ansible.builtin.shell: "sed -ne '/BEGIN CERTIFICATE/,$ p' /etc/openvpn/server/easy-rsa/pki/issued/{{ openvpn_client_name }}.crt"
   register: client_cert
@@ -287,6 +311,7 @@
 - name: "read {{ openvpn_client_name }} key"
   tags:
     - client_setup
+    - create_openvpn_client
   no_log: true
   ansible.builtin.slurp:
     src: "/etc/openvpn/server/easy-rsa/pki/private/{{ openvpn_client_name }}.key"
@@ -295,6 +320,7 @@
 - name: Read OpenVPN Static key
   tags:
     - client_setup
+    - create_openvpn_client
   no_log: true
   ansible.builtin.shell: sed -ne '/BEGIN OpenVPN Static key/,$ p' /etc/openvpn/server/tc.key
   register: openvpn_tc_key
@@ -302,6 +328,7 @@
 - name: Generate Client template
   tags:
     - client_setup
+    - create_openvpn_client
   ansible.builtin.template:
     src: client.conf.j2
     dest: "/root/{{ openvpn_client_name }}.ovpn"
@@ -309,9 +336,31 @@
 - name: "Download {{ openvpn_client_name }}.ovpn file"
   tags:
     - client_setup
+    - create_openvpn_client
+    - download_openvpn_client
   no_log: true
   when: openvpn_client_download_dir is defined
   ansible.builtin.fetch:
     src: "/root/{{ openvpn_client_name }}.ovpn"
     dest: "{{ openvpn_client_download_dir }}/{{ openvpn_client_name }}.ovpn"
     flat: yes
+
+- name:
+  tags:
+    - client_setup
+    - create_openvpn_client
+    - email_openvpn_client
+  when:
+    - mail_username is defined
+    - mail_password is defined
+    - mail_recipient is defined
+  mail:
+    host: "{{ mail_host }}"
+    port: "{{ mail_port }}"
+    username: "{{ mail_username }}"
+    password: "{{ mail_password }}"
+    to: "{{ mail_recipient }}"
+    subject: OpenVPN Client Configuration [Eyes Only]
+    body: "OpenVPN client configuration file attached in this email."
+    attach: "{{ openvpn_client_download_dir }}/{{ openvpn_client_name }}.ovpn"
+  delegate_to: localhost
