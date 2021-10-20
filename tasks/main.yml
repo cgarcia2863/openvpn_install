@@ -265,6 +265,7 @@
 - name: Obtain Public IP
   tags:
     - client_setup
+    - create_openvpn_client
     - obtain_public_ip
   when: openvpn_public_ip_addr == ''
   ansible.builtin.uri:
@@ -363,4 +364,3 @@
     subject: OpenVPN Client Configuration [Eyes Only]
     body: "OpenVPN client configuration file attached in this email."
     attach: "/root/{{ openvpn_client_name }}.ovpn"
-  delegate_to: localhost
